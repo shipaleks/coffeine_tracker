@@ -1,19 +1,17 @@
 import { useState } from 'react'
-import { supabase } from '../supabase'
+import { deleteLog } from '../data/localStorage'
 
 function TodayLogList({ logs, onDelete }) {
   const [confirmId, setConfirmId] = useState(null)
 
-  const handleDelete = async (id) => {
+  const handleDelete = (id) => {
     if (confirmId !== id) {
       setConfirmId(id)
       return
     }
-    const { error } = await supabase.from('caffeine_logs').delete().eq('id', id)
-    if (!error) {
-      onDelete(id)
-      setConfirmId(null)
-    }
+    deleteLog(id)
+    onDelete(id)
+    setConfirmId(null)
   }
 
   if (logs.length === 0) {
@@ -31,7 +29,7 @@ function TodayLogList({ logs, onDelete }) {
         <div key={log.id} className="log-item">
           <div className="log-item-info">
             <div style={{ fontWeight: 500 }}>
-              {log.drinks?.name || 'Напиток'} · {log.servings} порц.
+              {log.drink_name || 'Напиток'} · {log.servings} порц.
             </div>
             <div className="log-item-time">
               {new Date(log.consumed_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}

@@ -1,43 +1,33 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { supabase } from '../supabase'
+import { DRINKS, CATEGORIES } from '../data/drinks'
+import { addLog } from '../data/localStorage'
 
 function AddLog() {
-  const [drinks, setDrinks] = useState([])
   const [selectedDrink, setSelectedDrink] = useState(null)
   const [servings, setServings] = useState(1)
   const [consumedAt, setConsumedAt] = useState('')
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
+  const [activeCategory, setActiveCategory] = useState('coffee')
   const navigate = useNavigate()
 
   useEffect(() => {
-    loadDrinks()
     const now = new Date()
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
     setConsumedAt(now.toISOString().slice(0, 16))
   }, [])
 
-  const loadDrinks = async () => {
-    const { data } = await supabase.from('drinks').select('*').order('name')
-    setDrinks(data || [])
-  }
-
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!selectedDrink) return
 
     setSaving(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      setSaving(false)
-      return
-    }
-
+    
     const caffeineMg = servings * selectedDrink.caffeine_per_serving
 
-    const { error } = await supabase.from('caffeine_logs').insert({
-      user_id: user.id,
+    addLog({
       drink_id: selectedDrink.id,
+      drink_name: selectedDrink.name,
       servings,
       caffeine_mg: caffeineMg,
       consumed_at: consumedAt ? new Date(consumedAt).toISOString() : new Date().toISOString(),
@@ -45,21 +35,47 @@ function AddLog() {
     })
 
     setSaving(false)
-    if (!error) {
-      navigate('/')
-    }
+    navigate('/')
   }
 
   const totalMg = selectedDrink ? Math.round(servings * selectedDrink.caffeine_per_serving) : 0
+  
+  const filteredDrinks = DRINKS.filter(d => d.category === activeCategory)
 
   return (
     <div className="container">
       <h2 style={{ marginBottom: 16 }}>Добавить запись</h2>
 
+      {/* Category tabs */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+        {Object.entries(CATEGORIES).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => {
+              setActiveCategory(key)
+              setSelectedDrink(null)
+            }}
+            style={{
+              padding: '8px 16px',
+              borderRadius: 20,
+              border: 'none',
+              background: activeCategory === key ? '#4f46e5' : '#e5e7eb',
+              color: activeCategory === key ? 'white' : '#374151',
+              fontSize: 14,
+              cursor: 'pointer',
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       <div className="card" style={{ marginBottom: 12 }}>
-        <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>Выберите напиток</label>
+        <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>
+          {CATEGORIES[activeCategory]}
+        </label>
         <div className="drink-grid">
-          {drinks.map((drink) => (
+          {filteredDrinks.map((drink) => (
             <div
               key={drink.id}
               className={`drink-card${selectedDrink?.id === drink.id ? ' selected' : ''}`}

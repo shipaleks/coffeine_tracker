@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../supabase'
 import DailyLimitBar from '../components/DailyLimitBar'
 import TodayLogList from '../components/TodayLogList'
+import { getTodayLogs, getProfile } from '../data/localStorage'
 
 function Dashboard() {
   const [logs, setLogs] = useState([])
@@ -12,45 +12,26 @@ function Dashboard() {
     loadData()
   }, [])
 
-  const loadData = async () => {
+  const loadData = () => {
     setLoading(true)
-
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      setLoading(false)
-      return
-    }
-
-    const todayStart = new Date()
-    todayStart.setHours(0, 0, 0, 0)
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('daily_limit_mg')
-      .eq('id', user.id)
-      .single()
-
-    if (profile) {
-      setLimit(profile.daily_limit_mg)
-    } else {
-      await supabase.from('profiles').insert({ id: user.id, daily_limit_mg: 400 })
-    }
-
-    const { data: logsData } = await supabase
-      .from('caffeine_logs')
-      .select('*, drinks(name)')
-      .eq('user_id', user.id)
-      .gte('consumed_at', todayStart.toISOString())
-      .order('consumed_at', { ascending: false })
-
-    setLogs(logsData || [])
+    
+    // Load profile
+    const profile = getProfile()
+    setLimit(profile.daily_limit_mg || 400)
+    
+    // Load today's logs
+    const todayLogs = getTodayLogs()
+    setLogs(todayLogs)
+    
     setLoading(false)
   }
 
-  const totalCaffeine = logs.reduce((sum, log) => sum + log.caffeine_mg, 0)
+  const totalCaffeine = logs.reduce((sum, log) => sum + (log.caffeine_mg || 0), 0)
 
-  const handleDelete = (id) => {
-    setLogs((prev) => prev.filter((l) => l.id !== id))
+  const handleDelete = () => {
+    // Reload logs after deletion
+    const todayLogs = getTodayLogs()
+    setLogs(todayLogs)
   }
 
   if (loading) {

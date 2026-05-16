@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../supabase'
+import { getRecentLogs } from '../data/localStorage'
 
 function History() {
   const [logs, setLogs] = useState([])
@@ -9,25 +9,10 @@ function History() {
     loadHistory()
   }, [])
 
-  const loadHistory = async () => {
+  const loadHistory = () => {
     setLoading(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      setLoading(false)
-      return
-    }
-
-    const thirtyDaysAgo = new Date()
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-
-    const { data } = await supabase
-      .from('caffeine_logs')
-      .select('*, drinks(name)')
-      .eq('user_id', user.id)
-      .gte('consumed_at', thirtyDaysAgo.toISOString())
-      .order('consumed_at', { ascending: false })
-
-    setLogs(data || [])
+    const recentLogs = getRecentLogs(30)
+    setLogs(recentLogs)
     setLoading(false)
   }
 
@@ -59,7 +44,7 @@ function History() {
     <div className="container">
       <h2 style={{ marginBottom: 16 }}>История</h2>
       {Object.entries(grouped).map(([date, dayLogs]) => {
-        const dayTotal = dayLogs.reduce((sum, log) => sum + log.caffeine_mg, 0)
+        const dayTotal = dayLogs.reduce((sum, log) => sum + (log.caffeine_mg || 0), 0)
         return (
           <div key={date} className="history-group">
             <div className="history-group-title">
@@ -70,7 +55,7 @@ function History() {
                 <div key={log.id} className="log-item">
                   <div className="log-item-info">
                     <div style={{ fontWeight: 500 }}>
-                      {log.drinks?.name || 'Напиток'} · {log.servings} порц.
+                      {log.drink_name || 'Напиток'} · {log.servings} порц.
                     </div>
                     <div className="log-item-time">
                       {new Date(log.consumed_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
