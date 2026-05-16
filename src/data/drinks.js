@@ -36,17 +36,18 @@ export const DRINKS = [
   { id: 26, name: 'Burn', caffeine_per_serving: 80, serving_ml: 250, category: 'energy' },
   { id: 27, name: 'Adrenaline Rush', caffeine_per_serving: 76, serving_ml: 250, category: 'energy' },
   { id: 28, name: 'Coca-Cola', caffeine_per_serving: 34, serving_ml: 330, category: 'soda' },
-  { id: 29, name: 'Pepsi', caffeine_per_serving: 38, serving_ml: 330, category: 'soda' },
-  { id: 30, name: 'Dr Pepper', caffeine_per_serving: 41, serving_ml: 330, category: 'soda' },
-  { id: 31, name: 'Mountain Dew', caffeine_per_serving: 54, serving_ml: 330, category: 'soda' },
-  { id: 32, name: 'Квас', caffeine_per_serving: 0, serving_ml: 330, category: 'soda' },
-  { id: 33, name: 'Тархун', caffeine_per_serving: 0, serving_ml: 330, category: 'soda' },
+  { id: 29, name: 'Coca-Cola Zero', caffeine_per_serving: 34, serving_ml: 330, category: 'soda' },
+  { id: 30, name: 'Pepsi', caffeine_per_serving: 38, serving_ml: 330, category: 'soda' },
+  { id: 31, name: 'Dr Pepper', caffeine_per_serving: 41, serving_ml: 330, category: 'soda' },
+  { id: 32, name: 'Mountain Dew', caffeine_per_serving: 54, serving_ml: 330, category: 'soda' },
+  { id: 33, name: 'Квас', caffeine_per_serving: 0, serving_ml: 330, category: 'soda' },
+  { id: 34, name: 'Тархун', caffeine_per_serving: 0, serving_ml: 330, category: 'soda' },
   
   // Другое
-  { id: 34, name: 'Какао', caffeine_per_serving: 8, serving_ml: 200, category: 'other' },
-  { id: 35, name: 'Горячий шоколад', caffeine_per_serving: 5, serving_ml: 200, category: 'other' },
-  { id: 36, name: 'Мате', caffeine_per_serving: 80, serving_ml: 220, category: 'other' },
-  { id: 37, name: 'Гуарана (напиток)', caffeine_per_serving: 90, serving_ml: 250, category: 'other' },
+  { id: 35, name: 'Какао', caffeine_per_serving: 8, serving_ml: 200, category: 'other' },
+  { id: 36, name: 'Горячий шоколад', caffeine_per_serving: 5, serving_ml: 200, category: 'other' },
+  { id: 37, name: 'Мате', caffeine_per_serving: 80, serving_ml: 220, category: 'other' },
+  { id: 38, name: 'Гуарана (напиток)', caffeine_per_serving: 90, serving_ml: 250, category: 'other' },
 ];
 
 // Категории для фильтрации
